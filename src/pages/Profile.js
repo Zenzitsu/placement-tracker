@@ -1,34 +1,77 @@
 import React, { useState, useEffect } from 'react';
 import './Profile.css';
 
+const API_URL = 'http://localhost:5000/api';
+
 function Profile() {
   // State for personal details
-  const [profile, setProfile] = useState(() => {
-    const savedProfile = localStorage.getItem('profile');
-    return savedProfile ? JSON.parse(savedProfile) : { name: '', email: '', phone: '', portfolio: '' };
-  });
+  const [profile, setProfile] = useState({ name: '', email: '', phone: '', portfolio: '' });
+  const [profileLoading, setProfileLoading] = useState(true);
 
   // State for documents
-  const [documents, setDocuments] = useState(() => {
-    const savedDocs = localStorage.getItem('documents');
-    return savedDocs ? JSON.parse(savedDocs) : [];
-  });
+  const [documents, setDocuments] = useState([]);
+  const [documentsLoading, setDocumentsLoading] = useState(true);
   
   const [fileInput, setFileInput] = useState(null);
+  const [error, setError] = useState(null);
 
-  // Save profile to localStorage
+  // Fetch profile and documents on component mount
   useEffect(() => {
-    localStorage.setItem('profile', JSON.stringify(profile));
-  }, [profile]);
-  
-  // Save documents to localStorage
-  useEffect(() => {
-    localStorage.setItem('documents', JSON.stringify(documents));
-  }, [documents]);
+    fetchProfile();
+    fetchDocuments();
+  }, []);
 
-  const handleProfileChange = (e) => {
+  const fetchProfile = async () => {
+    try {
+      setProfileLoading(true);
+      const response = await fetch(`${API_URL}/profile`);
+      if (!response.ok) throw new Error('Failed to fetch profile');
+      const data = await response.json();
+      setProfile(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching profile:', err);
+    } finally {
+      setProfileLoading(false);
+    }
+  };
+
+  const fetchDocuments = async () => {
+    try {
+      setDocumentsLoading(true);
+      const response = await fetch(`${API_URL}/documents`);
+      if (!response.ok) throw new Error('Failed to fetch documents');
+      const data = await response.json();
+      setDocuments(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching documents:', err);
+    } finally {
+      setDocumentsLoading(false);
+    }
+  };
+
+  const handleProfileChange = async (e) => {
     const { name, value } = e.target;
-    setProfile({ ...profile, [name]: value });
+    const updatedProfile = { ...profile, [name]: value };
+    setProfile(updatedProfile);
+
+    // Save to backend
+    try {
+      const response = await fetch(`${API_URL}/profile`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedProfile)
+      });
+      
+      if (!response.ok) throw new Error('Failed to save profile');
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error saving profile:', err);
+    }
   };
   
   const handleFileChange = (e) => {
@@ -37,25 +80,49 @@ function Profile() {
       }
   };
   
-  const handleAddDocument = () => {
+  const handleAddDocument = async () => {
       if (!fileInput) {
           alert("Please select a file first.");
           return;
       }
-      const newDoc = {
-          id: Date.now(),
-          name: fileInput.name,
-          type: fileInput.type,
-          size: (fileInput.size / 1024).toFixed(2) + ' KB', // Size in KB
-      };
-      setDocuments([...documents, newDoc]);
-      // Clear the file input after adding
-      document.getElementById('file-upload').value = '';
-      setFileInput(null);
+      
+      try {
+        const response = await fetch(`${API_URL}/documents`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: fileInput.name,
+            type: fileInput.type,
+            size: (fileInput.size / 1024).toFixed(2) + ' KB'
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to add document');
+
+        await fetchDocuments(); // Refresh the list
+        document.getElementById('file-upload').value = '';
+        setFileInput(null);
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error adding document:', err);
+      }
   };
   
-  const handleDeleteDocument = (id) => {
-      setDocuments(documents.filter(doc => doc.id !== id));
+  const handleDeleteDocument = async (id) => {
+      try {
+        const response = await fetch(`${API_URL}/documents/${id}`, {
+          method: 'DELETE'
+        });
+
+        if (!response.ok) throw new Error('Failed to delete document');
+
+        await fetchDocuments(); // Refresh the list
+        setError(null);
+      } catch (err) {
+        setError(err.message);
+        console.error('Error deleting document:', err);
+      }
   };
 
 
@@ -63,9 +130,14 @@ function Profile() {
     <div className="profile-container">
       <h1>My Profile & Documents</h1>
 
+      {error && <div className="error-message">{error}</div>}
+
       <div className="profile-details">
         <h2>Personal Information</h2>
-        <div className="profile-form">
+        {profileLoading ? (
+          <p>Loading profile...</p>
+        ) : (
+          <div className="profile-form">
             <label>Full Name:</label>
             <input type="text" name="name" value={profile.name} onChange={handleProfileChange} placeholder="Your Name" />
             <label>Email Address:</label>
@@ -74,7 +146,8 @@ function Profile() {
             <input type="tel" name="phone" value={profile.phone} onChange={handleProfileChange} placeholder="123-456-7890" />
             <label>Portfolio/LinkedIn URL:</label>
             <input type="text" name="portfolio" value={profile.portfolio} onChange={handleProfileChange} placeholder="https://your-portfolio.com" />
-        </div>
+          </div>
+        )}
       </div>
 
       <div className="document-manager">

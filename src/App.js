@@ -1,22 +1,43 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import Header from './components/Header';
 import CompanyTracker from './pages/CompanyTracker';
 import Profile from './pages/Profile';
 import './App.css';
 
-function App() {
+// 1. Create a layout to wrap your pages (replacing the old App structure)
+const RootLayout = () => {
   return (
-    <Router>
+    <>
       <Header />
       <main className="container">
-        <Routes>
-          <Route path="/" element={<CompanyTracker />} />
-          <Route path="/profile" element={<Profile />} />
-        </Routes>
+        <Outlet /> {/* This is where CompanyTracker or Profile will render */}
       </main>
-    </Router>
+    </>
   );
+};
+
+// 2. Define your routes using a configuration object
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <RootLayout />,
+    children: [
+      { 
+        path: "/", 
+        element: <CompanyTracker /> 
+      },
+      { 
+        path: "/profile", 
+        element: <Profile /> 
+      },
+    ],
+  },
+]);
+
+// 3. Provide the router to the app
+function App() {
+  return <RouterProvider router={router} />;
 }
 
 export default App;

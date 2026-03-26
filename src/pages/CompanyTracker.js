@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import './CompanyTracker.css';
 
+const API_URL = 'http://localhost:5000/api';
+
 function CompanyTracker() {
   // State for the list of companies
-  const [companies, setCompanies] = useState(() => {
-    const savedCompanies = localStorage.getItem('companies');
-    return savedCompanies ? JSON.parse(savedCompanies) : [];
-  });
+  const [companies, setCompanies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // State for the form inputs
   const [newCompany, setNewCompany] = useState({
@@ -20,35 +21,89 @@ function CompanyTracker() {
   const [filter, setFilter] = useState('All');
   const [sortBy, setSortBy] = useState('dueDate');
 
-  // Effect to save companies to localStorage whenever they change
+  // Fetch companies from backend when component mounts
   useEffect(() => {
-    localStorage.setItem('companies', JSON.stringify(companies));
-  }, [companies]);
+    fetchCompanies();
+  }, []);
+
+  const fetchCompanies = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_URL}/companies`);
+      if (!response.ok) throw new Error('Failed to fetch companies');
+      const data = await response.json();
+      setCompanies(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error fetching companies:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewCompany({ ...newCompany, [name]: value });
   };
 
-  const handleAddCompany = (e) => {
+  const handleAddCompany = async (e) => {
     e.preventDefault();
     if (!newCompany.name || !newCompany.role || !newCompany.dueDate) {
       alert('Please fill in all fields.');
       return;
     }
-    const companyToAdd = { ...newCompany, id: Date.now() };
-    setCompanies([...companies, companyToAdd]);
-    setNewCompany({ name: '', role: '', dueDate: '', status: 'Interested' }); // Reset form
+    
+    try {
+      const response = await fetch(`${API_URL}/companies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newCompany)
+      });
+      
+      if (!response.ok) throw new Error('Failed to add company');
+      
+      await fetchCompanies(); // Refresh the list
+      setNewCompany({ name: '', role: '', dueDate: '', status: 'Interested' }); // Reset form
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error adding company:', err);
+    }
   };
 
-  const handleDeleteCompany = (id) => {
-    setCompanies(companies.filter((company) => company.id !== id));
+  const handleDeleteCompany = async (id) => {
+    try {
+      const response = await fetch(`${API_URL}/companies/${id}`, {
+        method: 'DELETE'
+      });
+      
+      if (!response.ok) throw new Error('Failed to delete company');
+      
+      await fetchCompanies(); // Refresh the list
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error deleting company:', err);
+    }
   };
   
-  const handleStatusChange = (id, newStatus) => {
-      setCompanies(companies.map(company => 
-        company.id === id ? {...company, status: newStatus} : company
-      ));
+  const handleStatusChange = async (id, newStatus) => {
+    try {
+      const response = await fetch(`${API_URL}/companies/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      
+      if (!response.ok) throw new Error('Failed to update company');
+      
+      await fetchCompanies(); // Refresh the list
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error updating company:', err);
+    }
   };
 
   // Extra Feature: Memoized calculation for filtered and sorted companies
@@ -87,6 +142,8 @@ function CompanyTracker() {
   return (
     <div className="tracker-container">
       <h1>Company Application Tracker</h1>
+
+      {error && <div className="error-message">{error}</div>}
 
       <form onSubmit={handleAddCompany} className="add-company-form">
         <h2>Add New Opportunity</h2>
@@ -150,6 +207,8 @@ function CompanyTracker() {
 
       <div className="company-list">
         <h2>My Applications</h2>
+        {loading && <p>Loading companies...</p>}
+        {!loading && (
         <table>
           <thead>
             <tr>
@@ -192,6 +251,7 @@ function CompanyTracker() {
             )}
           </tbody>
         </table>
+        )}
       </div>
     </div>
   );
