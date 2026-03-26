@@ -1,57 +1,159 @@
+@keyframes elasticIn {
+  0% { transform: scale(0.95); opacity: 0; }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes elasticOut {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(0.98); }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+@keyframes softBounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   margin: 0;
-  background-color: #f4f7f9;
-  color: #333;
+  background-color: #E0E5EC;
+  color: #2C3E50;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .container {
   max-width: 1200px;
   margin: 20px auto;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  background-color: #E0E5EC;
+  border-radius: 30px;
+  box-shadow: 
+    -10px -10px 20px rgba(255, 255, 255, 0.9),
+    10px 10px 20px rgba(163, 177, 198, 0.3);
+  animation: elasticIn 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 h1, h2 {
-  color: #1a253c;
-  border-bottom: 2px solid #eef2f7;
-  padding-bottom: 10px;
+  color: #2C3E50;
+  border: none;
+  padding-bottom: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 button {
-  background-color: #007bff;
-  color: white;
+  background-color: #E0E5EC;
+  color: #2C3E50;
   border: none;
-  padding: 10px 15px;
-  border-radius: 5px;
+  padding: 12px 28px;
+  border-radius: 25px;
   cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.2s ease-in-out;
+  font-size: 15px;
+  font-weight: 500;
+  transition: all 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 
+    -8px -8px 16px rgba(255, 255, 255, 1),
+    8px 8px 16px rgba(163, 177, 198, 0.3);
+  outline: none;
+  position: relative;
 }
 
 button:hover {
-  background-color: #0056b3;
+  box-shadow: 
+    -5px -5px 12px rgba(255, 255, 255, 0.9),
+    5px 5px 12px rgba(163, 177, 198, 0.2);
+  transform: translateY(-3px);
+  animation: softBounce 600ms ease-in-out;
+}
+
+button:active {
+  box-shadow: 
+    inset -4px -4px 10px rgba(255, 255, 255, 0.9),
+    inset 4px 4px 10px rgba(163, 177, 198, 0.3);
+  transform: translateY(0) scale(0.98);
+  transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 button.delete-btn {
-  background-color: #dc3545;
+  background-color: #E0E5EC;
+  color: #6B4F4F;
 }
 
-button.delete-btn:hover {
-  background-color: #c82333;
+button.delete-btn:active {
+  box-shadow: 
+    inset -4px -4px 10px rgba(255, 255, 255, 0.9),
+    inset 4px 4px 10px rgba(163, 177, 198, 0.3);
 }
 
 input[type="text"],
 input[type="date"],
 input[type="email"],
 input[type="tel"],
-select {
+select, textarea {
   width: 100%;
-  padding: 10px;
+  padding: 14px 18px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  background-color: #E0E5EC;
+  border: none;
+  border-radius: 20px;
   box-sizing: border-box;
+  color: #2C3E50;
+  font-size: 15px;
+  font-family: inherit;
+  transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 
+    inset -4px -4px 8px rgba(255, 255, 255, 0.8),
+    inset 4px 4px 8px rgba(163, 177, 198, 0.2);
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+select:focus, textarea:focus {
+  outline: none;
+  box-shadow: 
+    inset -2px -2px 5px rgba(255, 255, 255, 0.7),
+    inset 2px 2px 5px rgba(163, 177, 198, 0.25),
+    0 0 0 4px rgba(129, 140, 248, 0.15);
+  transform: scale(1.01);
+  transition: all 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Calendar Picker Styling */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 8px;
+  padding: 4px 8px;
+  background: linear-gradient(135deg, #FFFFFF 0%, #A3B1C6 100%);
+  filter: invert(0.8);
+  transition: all 300ms ease-in-out;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  transform: scale(1.1);
+}
+
+/* Dropdown styling */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232C3E50' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 35px;
+}
+
+select option {
+  background-color: #E0E5EC;
+  color: #2C3E50;
+  padding: 8px 12px;
+}
+
+select option:checked {
+  background-color: #818CF8;
+  color: #FFFFFF;
+  font-weight: 600;
 }
