@@ -1,7 +1,141 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import { Trash2, Calendar, ChevronDown } from 'lucide-react';
 import './CompanyTracker.css';
 
 const API_URL = 'http://localhost:5000/api';
+
+// --- CUSTOM NEUMORPHIC DROPDOWN ---
+const NeumorphicSelect = ({ options, value, onChange, placeholder }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div className="neo-select-container" ref={dropdownRef}>
+      <div 
+        className={`neo-select-header ${isOpen ? 'active' : ''}`} 
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{value || placeholder}</span>
+        <ChevronDown size={18} className={`neo-chevron ${isOpen ? 'open' : ''}`} />
+      </div>
+      
+      {isOpen && (
+        <ul className="neo-select-list">
+          {options.map((option) => (
+            <li 
+              key={option} 
+              className={`neo-select-item ${value === option ? 'selected' : ''}`}
+              onClick={() => {
+                onChange(option);
+                setIsOpen(false);
+              }}
+            >
+              {option}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+};
+
+// --- CUSTOM NEUMORPHIC DATE WRAPPER ---
+// --- FULLY CUSTOM NEUMORPHIC DATE PICKER ---
+const NeumorphicDatePicker = ({ name, value, onChange }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const dateRef = useRef(null);
+
+  // Close calendar when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dateRef.current && !dateRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Helper functions for calendar logic
+  const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
+  const firstDayOfMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1).getDay();
+
+  const handleDateSelect = (day) => {
+    // Format to YYYY-MM-DD to match native input behavior
+    const year = currentMonth.getFullYear();
+    const month = String(currentMonth.getMonth() + 1).padStart(2, '0');
+    const formattedDay = String(day).padStart(2, '0');
+    
+    // Simulate an event object so your existing onChange handler works
+    onChange({ target: { name, value: `${year}-${month}-${formattedDay}` } });
+    setIsOpen(false);
+  };
+
+  const changeMonth = (offset) => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + offset, 1));
+  };
+
+  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  const blanks = Array.from({ length: firstDayOfMonth }, (_, i) => i);
+
+  return (
+    <div className="neo-date-wrapper" ref={dateRef}>
+      <div 
+        className={`neo-select-header ${isOpen ? 'active' : ''}`} 
+        onClick={() => setIsOpen(!isOpen)}
+      >
+        <span>{value ? value : "Select Date"}</span>
+        <Calendar size={18} className="neo-calendar-icon" />
+      </div>
+
+      {isOpen && (
+        <div className="neo-calendar-popup">
+          <div className="neo-calendar-header">
+            <button type="button" onClick={() => changeMonth(-1)}>&lt;</button>
+            <span>
+              {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+            </span>
+            <button type="button" onClick={() => changeMonth(1)}>&gt;</button>
+          </div>
+          
+          <div className="neo-calendar-grid days-header">
+            <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+          </div>
+          
+          <div className="neo-calendar-grid">
+            {blanks.map(blank => <div key={`blank-${blank}`} className="neo-calendar-day empty"></div>)}
+            {days.map(day => {
+                // Check if this is the currently selected date
+                const isSelected = value === `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                
+                return (
+                    <div 
+                        key={day} 
+                        className={`neo-calendar-day ${isSelected ? 'selected' : ''}`}
+                        onClick={() => handleDateSelect(day)}
+                    >
+                        {day}
+                    </div>
+                )
+            })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 function CompanyTracker() {
   // State for the list of companies
@@ -19,7 +153,7 @@ function CompanyTracker() {
   
   // Extra Features: State for sorting and filtering
   const [filter, setFilter] = useState('All');
-  const [sortBy, setSortBy] = useState('dueDate');
+  const [sortBy, setSortBy] = useState('Due Date');
 
   // Fetch companies from backend when component mounts
   useEffect(() => {
@@ -115,7 +249,7 @@ function CompanyTracker() {
     }
     
     return [...filteredList].sort((a, b) => {
-        if (sortBy === 'dueDate') {
+        if (sortBy === 'Due Date') {
             return new Date(a.dueDate) - new Date(b.dueDate);
         }
         if (sortBy === 'name') {
@@ -137,7 +271,6 @@ function CompanyTracker() {
     if (diffDays <= 3) return 'due-soon';
     return '';
   };
-
 
   return (
     <div className="tracker-container">
@@ -163,45 +296,38 @@ function CompanyTracker() {
           placeholder="Role (e.g., SDE Intern)"
           required
         />
-        <input
-          type="date"
-          name="dueDate"
-          value={newCompany.dueDate}
-          onChange={handleInputChange}
-          required
+        <NeumorphicDatePicker 
+          name="dueDate" 
+          value={newCompany.dueDate} 
+          onChange={handleInputChange} 
         />
-        <select name="status" value={newCompany.status} onChange={handleInputChange}>
-          <option value="Interested">Interested</option>
-          <option value="Applied">Applied</option>
-          <option value="OA Eligible">OA Eligible</option>
-          <option value="Interviewing">Interviewing</option>
-          <option value="Offer">Offer</option>
-          <option value="Rejected">Rejected</option>
-          <option value="Ineligible">Ineligible</option>
-        </select>
+        <NeumorphicSelect 
+          options={['Interested', 'Applied', 'OA Eligible', 'Interviewing', 'Offer', 'Rejected', 'Ineligible']}
+          value={newCompany.status}
+          onChange={(val) => setNewCompany({ ...newCompany, status: val })}
+          placeholder="Select Status"
+        />
         <button type="submit">Add Company</button>
       </form>
 
       <div className="controls">
           <div className="filter-sort">
             <label>Filter by Status:</label>
-            <select onChange={(e) => setFilter(e.target.value)} value={filter}>
-                <option value="All">All</option>
-                <option value="Interested">Interested</option>
-                <option value="Applied">Applied</option>
-                <option value="OA Eligible">OA Eligible</option>
-                <option value="Interviewing">Interviewing</option>
-                <option value="Offer">Offer</option>
-                <option value="Rejected">Rejected</option>
-                <option value="Ineligible">Ineligible</option>
-            </select>
+            <NeumorphicSelect 
+              options={['All', 'Interested', 'Applied', 'OA Eligible', 'Interviewing', 'Offer', 'Rejected', 'Ineligible']}
+              value={filter}
+              onChange={(val) => setFilter(val)}
+              placeholder="All"
+            />
           </div>
           <div className="filter-sort">
             <label>Sort by:</label>
-            <select onChange={(e) => setSortBy(e.target.value)} value={sortBy}>
-                <option value="dueDate">Due Date</option>
-                <option value="name">Company Name</option>
-            </select>
+            <NeumorphicSelect 
+              options={["Due Date", "Company Name"]}
+              value={sortBy}
+              onChange={(val) => setSortBy(val)}
+              placeholder="Sort by"
+            />
           </div>
       </div>
 
@@ -227,15 +353,11 @@ function CompanyTracker() {
                   <td>{company.role}</td>
                   <td>{company.dueDate}</td>
                   <td>
-                    <select value={company.status} onChange={(e) => handleStatusChange(company.id, e.target.value)}>
-                        <option value="Interested">Interested</option>
-                        <option value="Applied">Applied</option>
-                        <option value="OA Eligible">OA Eligible</option>
-                        <option value="Interviewing">Interviewing</option>
-                        <option value="Offer">Offer</option>
-                        <option value="Rejected">Rejected</option>
-                        <option value="Ineligible">Ineligible</option>
-                    </select>
+                    <NeumorphicSelect 
+                      options={['Interested', 'Applied', 'OA Eligible', 'Interviewing', 'Offer', 'Rejected', 'Ineligible']}
+                      value={company.status}
+                      onChange={(e) => handleStatusChange(company.id, e.target.value)}
+                    />
                   </td>
                   <td>
                     <button className="delete-btn" onClick={() => handleDeleteCompany(company.id)}>
