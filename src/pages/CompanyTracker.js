@@ -356,7 +356,7 @@ function CompanyTracker() {
                     <NeumorphicSelect 
                       options={['Interested', 'Applied', 'OA Eligible', 'Interviewing', 'Offer', 'Rejected', 'Ineligible']}
                       value={company.status}
-                      onChange={(e) => handleStatusChange(company.id, e.target.value)}
+                      onChange={(val) => handleStatusChange(company.id, val)}
                     />
                   </td>
                   <td>
