@@ -1,0 +1,117 @@
+/* =========================================
+   Custom Neumorphic Dropdown
+   ========================================= */
+.neo-select-container {
+  position: relative;
+  width: 100%;
+  min-width: 180px;
+}
+
+.neo-select-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background-color: #E0E5EC;
+  border-radius: 12px;
+  color: #2C3E50;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 
+    inset -3px -3px 6px rgba(255, 255, 255, 0.7),
+    inset 3px 3px 6px rgba(163, 177, 198, 0.25);
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+/* Active state pushes the button "in" */
+.neo-select-header.active {
+  box-shadow: 
+    inset -4px -4px 8px rgba(255, 255, 255, 0.9),
+    inset 4px 4px 8px rgba(163, 177, 198, 0.35),
+    0 0 0 2px rgba(129, 140, 248, 0.2);
+}
+
+.neo-chevron {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: #4A5F7C;
+}
+
+.neo-chevron.open {
+  transform: rotate(180deg);
+}
+
+/* The floating dropdown menu */
+.neo-select-list {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 100%;
+  max-height: 250px;
+  overflow-y: auto;
+  background-color: #E0E5EC;
+  border-radius: 15px;
+  padding: 8px;
+  margin: 0;
+  list-style: none;
+  z-index: 100;
+  box-shadow: 
+    -8px -8px 16px rgba(255, 255, 255, 0.8),
+    8px 8px 16px rgba(163, 177, 198, 0.3);
+  animation: dropDownFade 0.25s ease-out forwards;
+  will-change: transform, opacity;
+  
+  /* Scrollbar styles */
+  scrollbar-width: thin;
+  scrollbar-color: #A3B1C6 transparent;
+}
+
+@keyframes dropDownFade {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.neo-select-item {
+  padding: 10px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: #4A5F7C;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.neo-select-item:hover, .neo-select-item.selected {
+  color: #818CF8;
+  background-color: transparent;
+  box-shadow: 
+    inset -2px -2px 5px rgba(255, 255, 255, 0.8),
+    inset 2px 2px 5px rgba(163, 177, 198, 0.2);
+}
+
+/* Chrome, Edge, and Safari support */
+.neo-select-list::-webkit-scrollbar {
+  width: 2px;
+}
+
+/* The groove the scrollbar slides in */
+.neo-select-list::-webkit-scrollbar-track {
+  background: #E0E5EC;
+  border-radius: 10px;
+  box-shadow: 
+    inset 2px 2px 4px rgba(163, 177, 198, 0.3), 
+    inset -2px -2px 4px rgba(255, 255, 255, 0.7);
+  margin: 8px 0; /* Keeps the track from touching the very top/bottom edges */
+}
+
+/* The draggable scrollbar pill */
+.neo-select-list::-webkit-scrollbar-thumb {
+  background-color: #A3B1C6; /* Soft blue-grey matching your theme */
+  border-radius: 10px;
+  border: 1px solid #E0E5EC; /* Creates a nice padded effect inside the track */
+  transition: background-color 0.2s ease;
+}
+
+/* Hover effect for the scrollbar */
+.neo-select-list::-webkit-scrollbar-thumb:hover {
+  background-color: #818CF8; /* Lights up with your primary accent color */
+}
