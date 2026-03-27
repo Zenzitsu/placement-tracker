@@ -5,6 +5,7 @@
   position: relative;
   width: 100%;
   min-width: 180px;
+  margin-bottom: 15px; 
 }
 
 .neo-select-header {

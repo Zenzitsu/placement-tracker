@@ -24,7 +24,7 @@ const CompanyList = ({ companies, loading, onUpdateStatus, onDelete }) => {
       ) : (
         <table>
           <thead>
-            <tr>
+            <tr className='table-head'>
               <th>Company</th>
               <th>Role</th>
               <th>Due Date</th>
@@ -39,7 +39,7 @@ const CompanyList = ({ companies, loading, onUpdateStatus, onDelete }) => {
                   <td>{company.name}</td>
                   <td>{company.role}</td>
                   <td>{company.dueDate}</td>
-                  <td>
+                  <td className='neumorphic-select'>
                     <NeumorphicSelect 
                       options={['Interested', 'Applied', 'OA Eligible', 'Interviewing', 'Offer', 'Rejected', 'Ineligible']}
                       value={company.status}

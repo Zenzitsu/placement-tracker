@@ -33,12 +33,22 @@ th {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #4A5F7C;
-  padding-bottom: 8px;
+  padding: 25;
   border-bottom: 2px solid rgba(163, 177, 198, 0.2);
 }
 
 td {
   font-weight: 500;
+}
+
+.table-head {
+  transition: none;
+}
+.table-head:hover {
+  transform: none;
+  box-shadow: 
+    -4px -4px 10px rgba(255, 255, 255, 0.8),
+    4px 4px 10px rgba(163, 177, 198, 0.2);
 }
 
 /* Table Row Magic */
@@ -50,11 +60,10 @@ tr {
     4px 4px 10px rgba(163, 177, 198, 0.2);
   /* Smooth, non-jiggly transitions */
   transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
-  will-change: transform, box-shadow;
 }
 
 tr:hover {
-  transform: translateY(-2px); /* Reduced movement for less stutter */
+  transform: translateY(-1px); /* Reduced movement for less stutter */
   box-shadow: 
     -6px -6px 14px rgba(255, 255, 255, 0.9),
     6px 6px 14px rgba(163, 177, 198, 0.25);
@@ -108,4 +117,8 @@ tr button.delete-btn:active {
   box-shadow: 
     inset -2px -2px 4px rgba(255, 255, 255, 0.6),
     inset 2px 2px 4px rgba(163, 177, 198, 0.2);
+}
+
+.neumorphic-select {
+  padding-bottom: 2px;
 }

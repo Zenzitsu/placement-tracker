@@ -3,6 +3,7 @@
    ========================================= */
 .neo-date-wrapper {
   position: relative;
+  margin-bottom: 15px; 
   width: 100%;
 }
 
