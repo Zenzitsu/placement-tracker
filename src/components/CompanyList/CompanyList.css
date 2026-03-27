@@ -1,0 +1,111 @@
+/* =========================================
+   Container & Spacing
+   ========================================= */
+.company-list {
+  margin-top: 30px;
+}
+
+.company-list h2 {
+    color: #2C3E50;
+    font-weight: 600;
+}
+
+/* =========================================
+   Table Styles
+   ========================================= */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 12px;
+  margin-top: 10px;
+}
+
+th, td {
+  padding: 16px 20px;
+  text-align: left;
+  border: none;
+  color: #2C3E50;
+}
+
+th {
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #4A5F7C;
+  padding-bottom: 8px;
+  border-bottom: 2px solid rgba(163, 177, 198, 0.2);
+}
+
+td {
+  font-weight: 500;
+}
+
+/* Table Row Magic */
+tr {
+  background-color: #E0E5EC;
+  border-radius: 15px;
+  box-shadow: 
+    -4px -4px 10px rgba(255, 255, 255, 0.8),
+    4px 4px 10px rgba(163, 177, 198, 0.2);
+  /* Smooth, non-jiggly transitions */
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+  will-change: transform, box-shadow;
+}
+
+tr:hover {
+  transform: translateY(-2px); /* Reduced movement for less stutter */
+  box-shadow: 
+    -6px -6px 14px rgba(255, 255, 255, 0.9),
+    6px 6px 14px rgba(163, 177, 198, 0.25);
+}
+
+/* Rounded corners for table rows */
+tr td:first-child { border-radius: 15px 0 0 15px; }
+tr td:last-child { border-radius: 0 15px 15px 0; }
+
+/* Status Classes */
+.due-soon { color: #d97706; } /* Warning color instead of grey */
+.past-due { 
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* =========================================
+   Table Specific Interactive Elements
+   ========================================= */
+
+/* The actual select from NeumorphicSelect handles its own design mostly,
+   but there was a global 'tr select' rule previously. Since NeumorphicSelect 
+   replaces standard select, we omit standard select styling here to rely on the custom component.
+*/
+
+tr button.delete-btn {
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 10px;
+  background-color: #E0E5EC;
+  color: #d9534f;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 
+    -3px -3px 6px rgba(255, 255, 255, 0.8),
+    3px 3px 6px rgba(163, 177, 198, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+}
+
+tr button.delete-btn:hover {
+  transform: translateY(-1px);
+  color: #c9302c;
+  box-shadow: 
+    -4px -4px 8px rgba(255, 255, 255, 0.9),
+    4px 4px 8px rgba(163, 177, 198, 0.25);
+}
+
+tr button.delete-btn:active {
+  transform: translateY(1px);
+  box-shadow: 
+    inset -2px -2px 4px rgba(255, 255, 255, 0.6),
+    inset 2px 2px 4px rgba(163, 177, 198, 0.2);
+}

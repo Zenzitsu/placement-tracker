@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import Header from './components/Header';
-import CompanyTracker from './pages/CompanyTracker';
+import CompanyTracker from './pages/CompanyTracker/CompanyTracker';
 import Profile from './pages/Profile';
 import './App.css';
 
