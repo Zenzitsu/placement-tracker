@@ -2,7 +2,7 @@ import React from 'react';
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom';
 import Header from './components/Header';
 import CompanyTracker from './pages/CompanyTracker/CompanyTracker';
-import Profile from './pages/Profile';
+import Profile from './pages/Profile/Profile';
 import './App.css';
 
 // 1. Create a layout to wrap your pages (replacing the old App structure)
