@@ -108,7 +108,7 @@ tr button.delete-btn:hover {
   transform: translateY(-1px);
   color: #c9302c;
   box-shadow: 
-    -4px -4px 8px rgba(255, 255, 255, 0.9),
+    4px 4px 8px rgba(189, 78, 78, 0.9),
     4px 4px 8px rgba(163, 177, 198, 0.25);
 }
 
