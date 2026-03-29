@@ -4,7 +4,7 @@ import CompanyControls from '../../components/CompanyControls/CompanyControls';
 import CompanyList from '../../components/CompanyList/CompanyList';
 import './CompanyTracker.css';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = process.env.REACT_APP_API_URL;
 
 function CompanyTracker() {
   const [companies, setCompanies] = useState([]);

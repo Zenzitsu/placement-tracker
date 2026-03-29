@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { initializeDatabase } = require('./db/database');
+require('dotenv').config();
 
 // Import routes
 const companiesRoutes = require('./routes/companies');
